@@ -41,8 +41,9 @@ class Player(xbmc.Player):
         notify("{} video Fit to Screen zoom:{} pixel ratio:{}".format(video_aspect, zoom_amt, pixel_ratio))
 
     def getPlayingVideoAspectRatio(self):
+        playerid = self.getActiveVideoPlayerId()
         req = {'jsonrpc': '2.0',"method": "Player.GetItem",
-               "params": {"properties": ["streamdetails"], "playerid": 1 }, 
+               "params": {"properties": ["streamdetails"], "playerid": playerid }, 
                "id": "VideoGetItem"
                }
         resp = json.loads(xbmc.executeJSONRPC(json.dumps(req)))
@@ -59,6 +60,19 @@ class Player(xbmc.Player):
                "id": 1
                }
         xbmc.executeJSONRPC(json.dumps(req))
+
+    def getActiveVideoPlayerId(self):
+        req = {'jsonrpc': '2.0',"method": "Player.GetActivePlayers",
+               "id": 1
+                }
+        resp = json.loads(xbmc.executeJSONRPC(json.dumps(req)))
+
+        for player in resp["result"]:
+            if player["type"] == "video":
+                return player["playerid"]
+
+        warn("Active video player not found, skipping adjustment")
+        return None
 
     def captureAspectRatio(self):
         xbmc.sleep(500)
