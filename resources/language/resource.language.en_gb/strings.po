@@ -1,0 +1,45 @@
+# Valerion Cinema language file
+# Addon Name: Valerion Cinema
+# Addon id: service.valerion.cinema
+# Addon Provider: Ryan, ryanfitz
+msgid ""
+msgstr ""
+"Project-Id-Version: Kodi Addons\n"
+"Report-Msgid-Bugs-To: translations@kodi.tv\n"
+"POT-Creation-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: Kodi Translation Team\n"
+"Language-Team: English (https://kodi.weblate.cloud/languages/en_gb/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: en\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgctxt "#32001"
+msgid "General"
+msgstr "General"
+
+msgctxt "#32003"
+msgid "Enabled"
+msgstr "Enabled"
+
+msgctxt "#32005"
+msgid "2.40"
+msgstr "2.40"
+
+msgctxt "#32006"
+msgid "2.39"
+msgstr "2.39"
+
+msgctxt "#32007"
+msgid "2.37"
+msgstr "2.37"
+
+msgctxt "#32011"
+msgid "2.35"
+msgstr "2.35"
+
+msgctxt "#32009"
+msgid "Screen Aspect Ratio"
+msgstr "Screen Aspect Ratio"

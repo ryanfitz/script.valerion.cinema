@@ -1,0 +1,29 @@
+<?xml version="1.0" ?>
+<settings version="1">
+    <section id="script.valerion.cinema">
+        <category help="" id="general" label="32001">
+            <group id="1">
+                <setting id="screen_ar" type="string" label="32009" help="">
+                    <level>0</level>
+                    <default>2.4</default>
+                    <constraints>
+                        <options>
+                            <option label="32005">2.4</option>
+                            <option label="32006">2.39</option>
+                            <option label="32007">2.37</option>
+                            <option label="32011">2.35</option>
+                        </options>
+                    </constraints>
+                    <control type="list" format="string">
+                        <heading>32009</heading>
+                    </control>
+                </setting>
+                <setting help="" id="automatically_execute" label="32003" type="boolean">
+                    <level>0</level>
+                    <default>true</default>
+                    <control type="toggle"/>
+                </setting>
+            </group>
+        </category>
+    </section>
+</settings>

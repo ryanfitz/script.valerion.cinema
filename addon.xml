@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<addon id="script.valerion.cinema" name="ValerionCinema" version="1.0.0" provider-name="fitz">
+	<requires>
+		<import addon="xbmc.python" version="3.0.0"/>
+		<import addon="script.module.requests" version="2.31.0"/>
+		<import addon="script.module.beautifulsoup4" version="4.12.2"/>
+		<import addon="script.module.soupsieve" version="2.4.1"/>
+	</requires>
+	<extension point="xbmc.service" library="addon.py"/>
+	<extension point="xbmc.python.script" library="addon.py">
+		<provides>executable</provides>
+	</extension>
+	<extension point="xbmc.addon.metadata">
+		<platform>all</platform>
+		<summary lang="en">ValerionCinema</summary>
+		<description lang="en">Automate CIH for your Valerion projector and a Scope screen. This plugin will automatically fit video to your screen, removing top and bottom black bars while preserving aspect ratio. Your Valerion must be in ultrawidescreen mode, which is activated by using projector auto alignment on a scope screen</description>
+		<license>GNU General Public License, v3</license>
+		<language></language>
+		<forum></forum>
+		<source>https://github.com/ryanfitz/script.valerion.cinema</source>
+		<website></website>
+		<email></email>
+		<assets>
+			<icon>resources/icon.png</icon>
+			<fanart>resources/fanart.jpg</fanart>
+		</assets>
+		<news> v0.0.1  (2025-03-09) - Initial Release</news>
+	</extension>
+</addon>
