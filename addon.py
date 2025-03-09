@@ -31,8 +31,8 @@ class Player(xbmc.Player):
         video_aspect = self.getPlayingVideoAspectRatio()
 
         if video_aspect is None:
-            warn("Video Aspect Ratio Not Detected, skipping adjustment")
-            return
+            warn("Video Aspect Ratio Not Detected, Manually Select")
+            video_aspect = self.manuallySelectVideoAspectRatio()
 
         zoom_amt = round(video_aspect / standard_screen_aspect, 2)
         pixel_ratio = round(standard_screen_aspect / scope_screen_aspect, 2)
@@ -75,6 +75,11 @@ class Player(xbmc.Player):
         warn("Active video player not found, skipping adjustment")
         return None
 
+    def manuallySelectVideoAspectRatio(self):
+        options = ['2.4', '2.0', '1.85', '1.78', '1.33']
+        selected_position = xbmcgui.Dialog().select("Select Video Aspect Ratio", options)
+        return float(options[selected_position])
+                                                            
     def captureAspectRatio(self):
         xbmc.sleep(500)
         return xbmc.RenderCapture().getAspectRatio()
