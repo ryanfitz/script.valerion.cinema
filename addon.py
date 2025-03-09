@@ -9,8 +9,12 @@ import json
 monitor = xbmc.Monitor()
 player = xbmc.Player()
 
+__addon_id__ = 'script.valerion.cinema'
+__addon = xbmcaddon.Addon(__addon_id__)
+__icon__ = __addon.getAddonInfo('icon')
+
 def notify(msg):
-    xbmcgui.Dialog().notification("Valerion Cinema", msg, None, 5000)
+    xbmcgui.Dialog().notification("Valerion Cinema", msg, __icon__, 3000)
 
 def warn(msg):
     xbmcgui.Dialog().notification("Valerion Cinema", msg, xbmcgui.NOTIFICATION_WARNING, 5000)
@@ -20,7 +24,7 @@ class Player(xbmc.Player):
         xbmc.Player.__init__(self)
 
     def onAVStarted(self):
-        if not player.isPlayingVideo or xbmcaddon.Addon().getSetting("automatically_execute") == "false":
+        if not player.isPlayingVideo:
             return
         
         scope_screen_aspect = float(xbmcaddon.Addon().getSetting("screen_ar"))
@@ -28,11 +32,15 @@ class Player(xbmc.Player):
 
         # xbmc.log(msg=repr(player.getPlayingItem()), level=xbmc.LOGINFO)
 
-        video_aspect = self.getPlayingVideoAspectRatio()
-
-        if video_aspect is None:
-            warn("Video Aspect Ratio Not Detected, Manually Select")
+        video_aspect = None
+        
+        if xbmcaddon.Addon().getSetting("auto_detect_ar") == "false":
             video_aspect = self.manuallySelectVideoAspectRatio()
+        else:
+            video_aspect = self.getPlayingVideoAspectRatio()
+            if video_aspect is None:
+                warn("Video Aspect Ratio Not Detected, Manually Select")
+                video_aspect = self.manuallySelectVideoAspectRatio()
 
         zoom_amt = round(video_aspect / standard_screen_aspect, 2)
         pixel_ratio = round(standard_screen_aspect / scope_screen_aspect, 2)

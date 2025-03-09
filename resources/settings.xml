@@ -18,7 +18,7 @@
                         <heading>32009</heading>
                     </control>
                 </setting>
-                <setting help="" id="automatically_execute" label="32003" type="boolean">
+                <setting help="" id="auto_detect_ar" label="32003" type="boolean">
                     <level>0</level>
                     <default>true</default>
                     <control type="toggle"/>

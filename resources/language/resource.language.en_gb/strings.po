@@ -21,8 +21,8 @@ msgid "General"
 msgstr "General"
 
 msgctxt "#32003"
-msgid "Enabled"
-msgstr "Enabled"
+msgid "Auto Detect Video Aspect Ratio"
+msgstr "Auto Detect Video Aspect Ratio"
 
 msgctxt "#32005"
 msgid "2.40"
