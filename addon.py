@@ -49,8 +49,9 @@ class Player(xbmc.Player):
         resp = json.loads(xbmc.executeJSONRPC(json.dumps(req)))
 
         try:
-            aspect_raw = resp["result"]["item"]["streamdetails"]["video"][0]['aspect']
-            return round(aspect_raw, 2)
+            for video in resp["result"]["item"]["streamdetails"]["video"]:
+                if "aspect" in video:
+                    return round(video["aspect"], 2)
         except KeyError:
             return None
 
