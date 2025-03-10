@@ -42,7 +42,12 @@ class Player(xbmc.Player):
                 warn("Video Aspect Ratio Not Detected, Manually Select")
                 video_aspect = self.manuallySelectVideoAspectRatio()
 
-        zoom_amt = round(video_aspect / standard_screen_aspect, 2)
+        # only zoom videos wider than 16/9 container
+        if video_aspect >= standard_screen_aspect:
+            zoom_amt = round(video_aspect / standard_screen_aspect, 2)
+        else:
+            zoom_amt = 1.0
+
         pixel_ratio = round(standard_screen_aspect / scope_screen_aspect, 2)
 
         self.setPlayerViewMode(zoom_amt, pixel_ratio)
