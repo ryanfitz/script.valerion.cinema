@@ -14,7 +14,7 @@ __addon = xbmcaddon.Addon(__addon_id__)
 __icon__ = __addon.getAddonInfo('icon')
 
 def notify(msg):
-    xbmcgui.Dialog().notification("Valerion Cinema", msg, __icon__, 3000)
+    xbmcgui.Dialog().notification("Valerion Cinema", msg, __icon__, 5000)
 
 def warn(msg):
     xbmcgui.Dialog().notification("Valerion Cinema", msg, xbmcgui.NOTIFICATION_WARNING, 5000)
@@ -46,7 +46,7 @@ class Player(xbmc.Player):
         pixel_ratio = round(standard_screen_aspect / scope_screen_aspect, 2)
 
         self.setPlayerViewMode(zoom_amt, pixel_ratio)
-        notify("{} video Fit to Screen zoom:{} pixel ratio:{}".format(video_aspect, zoom_amt, pixel_ratio))
+        notify("{} Video Fit to {} Screen\nzoom:{} pixel ratio:{}".format(video_aspect, scope_screen_aspect, zoom_amt, pixel_ratio))
 
     def getPlayingVideoAspectRatio(self):
         playerid = self.getActiveVideoPlayerId()
