@@ -26,19 +26,18 @@ class Player(xbmc.Player):
     def onAVStarted(self):
         if not player.isPlayingVideo:
             return
-        
+
         scope_screen_aspect = float(xbmcaddon.Addon().getSetting("screen_ar"))
         standard_screen_aspect = 16/9
 
         # xbmc.log(msg=repr(player.getPlayingItem()), level=xbmc.LOGINFO)
 
         video_aspect = None
-        container_aspect = standard_screen_aspect 
+        container_aspect = float(xbmc.getInfoLabel("Player.Process(VideoDAR)"))
 
         video_stream_details = self.getPlayingVideoStreamDetails()
         if video_stream_details is not None:
             video_aspect = video_stream_details.get('video_ar')
-            container_aspect = video_stream_details.get('container_ar')
         
         if xbmcaddon.Addon().getSetting("auto_detect_ar") == "false":
             video_aspect = self.manuallySelectVideoAspectRatio()
