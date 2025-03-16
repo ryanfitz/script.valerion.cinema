@@ -33,18 +33,22 @@ class Player(xbmc.Player):
         # xbmc.log(msg=repr(player.getPlayingItem()), level=xbmc.LOGINFO)
 
         video_aspect = None
+        container_aspect = standard_screen_aspect 
+
+        video_stream_details = self.getPlayingVideoStreamDetails()
+        if video_stream_details is not None:
+            video_aspect = video_stream_details.get('video_ar')
+            container_aspect = video_stream_details.get('container_ar')
         
         if xbmcaddon.Addon().getSetting("auto_detect_ar") == "false":
             video_aspect = self.manuallySelectVideoAspectRatio()
-        else:
-            video_aspect = self.getPlayingVideoAspectRatio()
-            if video_aspect is None:
-                warn("Video Aspect Ratio Not Detected, Manually Select")
-                video_aspect = self.manuallySelectVideoAspectRatio()
+        elif video_aspect is None:
+            warn("Video Aspect Ratio Not Detected, Manually Select")
+            video_aspect = self.manuallySelectVideoAspectRatio()
 
-        # only zoom videos wider than 16/9 container
-        if video_aspect >= standard_screen_aspect:
-            zoom_amt = round(video_aspect / standard_screen_aspect, 2)
+        # only zoom videos wider than container
+        if video_aspect >= container_aspect:
+            zoom_amt = round(video_aspect / container_aspect, 2)
         else:
             zoom_amt = 1.0
 
@@ -53,7 +57,7 @@ class Player(xbmc.Player):
         self.setPlayerViewMode(zoom_amt, pixel_ratio)
         notify("{} Video Fit to {} Screen\nzoom:{} pixel ratio:{}".format(video_aspect, scope_screen_aspect, zoom_amt, pixel_ratio))
 
-    def getPlayingVideoAspectRatio(self):
+    def getPlayingVideoStreamDetails(self):
         playerid = self.getActiveVideoPlayerId()
         req = {'jsonrpc': '2.0',"method": "Player.GetItem",
                "params": {"properties": ["streamdetails"], "playerid": playerid }, 
@@ -62,9 +66,14 @@ class Player(xbmc.Player):
         resp = json.loads(xbmc.executeJSONRPC(json.dumps(req)))
 
         try:
+            result = {}
             for video in resp["result"]["item"]["streamdetails"]["video"]:
                 if "aspect" in video:
-                    return round(video["aspect"], 2)
+                    result["video_ar"] = round(video["aspect"], 2)
+                if "height" in video and "width" in video:
+                    result["container_ar"] = round(video["width"] / video["height"], 2)
+        
+            return result
         except KeyError:
             return None
 
