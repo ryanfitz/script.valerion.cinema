@@ -35,9 +35,14 @@ class Player(xbmc.Player):
         video_aspect = None
         container_aspect = float(xbmc.getInfoLabel("Player.Process(VideoDAR)"))
 
-        video_stream_details = self.getPlayingVideoStreamDetails()
-        if video_stream_details is not None:
-            video_aspect = video_stream_details.get('video_ar')
+        # Check for DoVi L5 offsets first
+        dovi_aspect = self.getDoViAspectRatio()
+        if dovi_aspect:
+            video_aspect = dovi_aspect
+        else:
+            video_stream_details = self.getPlayingVideoStreamDetails()
+            if video_stream_details is not None:
+                video_aspect = video_stream_details.get('video_ar')
         
         if xbmcaddon.Addon().getSetting("auto_detect_ar") == "false":
             video_aspect = self.manuallySelectVideoAspectRatio()
@@ -75,6 +80,29 @@ class Player(xbmc.Player):
             return result
         except KeyError:
             return None
+
+    def getDoViAspectRatio(self):
+        dovi_top = xbmc.getInfoLabel("Player.Process(video.dovi.l5.top.offset)")
+        if dovi_top:
+            try:
+                top = int(dovi_top)
+                bottom = int(xbmc.getInfoLabel("Player.Process(video.dovi.l5.bottom.offset)") or 0)
+                left = int(xbmc.getInfoLabel("Player.Process(video.dovi.l5.left.offset)") or 0)
+                right = int(xbmc.getInfoLabel("Player.Process(video.dovi.l5.right.offset)") or 0)
+                
+                width = int(xbmc.getInfoLabel("Player.Process(VideoWidth)") or 0)
+                height = int(xbmc.getInfoLabel("Player.Process(VideoHeight)") or 0)
+                
+                if width > 0 and height > 0:
+                    active_width = width - left - right
+                    active_height = height - top - bottom
+                    if active_height > 0:
+                        video_aspect = round(float(active_width) / float(active_height), 2)
+                        xbmc.log("Valerion Cinema: Using DoVi L5 offsets - AR: {}".format(video_aspect), level=xbmc.LOGINFO)
+                        return video_aspect
+            except ValueError:
+                xbmc.log("Valerion Cinema: Failed to parse DoVi L5 offsets", level=xbmc.LOGERROR)
+        return None
 
     def setPlayerViewMode(self, zoom_amt, pixel_ratio):
         req = {'jsonrpc': '2.0',"method": "Player.SetViewMode",
