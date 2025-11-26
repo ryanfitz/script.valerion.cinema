@@ -25,7 +25,7 @@ class Player(xbmc.Player):
         self.current_zoom_amt = None
 
     def onAVStarted(self):
-        if not player.isPlayingVideo:
+        if not player.isPlayingVideo():
             return
 
         scope_screen_aspect = float(xbmcaddon.Addon().getSetting("screen_ar"))
@@ -82,17 +82,22 @@ class Player(xbmc.Player):
         except KeyError:
             return None
 
+    def is_valid_infolabel(self, label, value):
+        return value and value.strip() and value.lower() != label.lower()
+    
     def getDoViAspectRatio(self):
-        dovi_top = xbmc.getInfoLabel("Player.Process(video.dovi.l5.top.offset)")
-        if dovi_top:
+        offset_top_label = 'Player.Process(video.dovi.l5.top.offset)'
+        dovi_top = xbmc.getInfoLabel(offset_top_label)
+
+        if self.is_valid_infolabel(offset_top_label, dovi_top):
             try:
                 top = int(dovi_top)
-                bottom = int(xbmc.getInfoLabel("Player.Process(video.dovi.l5.bottom.offset)") or 0)
-                left = int(xbmc.getInfoLabel("Player.Process(video.dovi.l5.left.offset)") or 0)
-                right = int(xbmc.getInfoLabel("Player.Process(video.dovi.l5.right.offset)") or 0)
+                bottom = int(xbmc.getInfoLabel('Player.Process(video.dovi.l5.bottom.offset)') or 0)
+                left = int(xbmc.getInfoLabel('Player.Process(video.dovi.l5.left.offset)') or 0)
+                right = int(xbmc.getInfoLabel('Player.Process(video.dovi.l5.right.offset)') or 0)
                 
-                width = int(xbmc.getInfoLabel("Player.Process(VideoWidth)") or 0)
-                height = int(xbmc.getInfoLabel("Player.Process(VideoHeight)") or 0)
+                width = int(xbmc.getInfoLabel('Player.Process(VideoWidth)') or 0)
+                height = int(xbmc.getInfoLabel('Player.Process(VideoHeight)') or 0)
                 
                 if width > 0 and height > 0:
                     active_width = width - left - right
@@ -105,7 +110,7 @@ class Player(xbmc.Player):
                 xbmc.log("Valerion Cinema: Failed to parse DoVi L5 offsets", level=xbmc.LOGERROR)
         return None
 
-    def setDoViViewMode(self):
+    def setViewModeUsingDoViOffsets(self):
         dovi_aspect = self.getDoViAspectRatio()
         if dovi_aspect:
             scope_screen_aspect = float(xbmcaddon.Addon().getSetting("screen_ar"))
@@ -165,7 +170,10 @@ class Player(xbmc.Player):
 p = Player()
 
 while not monitor.abortRequested():
+    if player.isPlayingVideo():
+        p.setViewModeUsingDoViOffsets()
+
     # Sleep/wait for abort for 10 seconds
-    if monitor.waitForAbort(10):
+    if monitor.waitForAbort(1):
         # Abort was requested while waiting. We should exit
         break
