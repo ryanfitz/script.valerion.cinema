@@ -22,6 +22,7 @@ def warn(msg):
 class Player(xbmc.Player):
     def __init__(self):
         xbmc.Player.__init__(self)
+        self.current_zoom_amt = None
 
     def onAVStarted(self):
         if not player.isPlayingVideo:
@@ -122,11 +123,18 @@ class Player(xbmc.Player):
             notify("{} Video Fit to {} Screen\nzoom:{} pixel ratio:{}".format(dovi_aspect, scope_screen_aspect, zoom_amt, pixel_ratio))
 
     def setPlayerViewMode(self, zoom_amt, pixel_ratio):
-        req = {'jsonrpc': '2.0',"method": "Player.SetViewMode",
-               "params": {"viewmode": {"zoom": zoom_amt, "pixelratio": pixel_ratio}}, 
-               "id": 1
-               }
-        xbmc.executeJSONRPC(json.dumps(req))
+        if zoom_amt != self.current_zoom_amt:
+            req = {'jsonrpc': '2.0',"method": "Player.SetViewMode",
+                   "params": {"viewmode": {"zoom": zoom_amt, "pixelratio": pixel_ratio}}, 
+                   "id": 1
+                   }
+            result_raw = xbmc.executeJSONRPC(json.dumps(req))
+            result = json.loads(result_raw)
+            if result["result"] != "OK":
+                xbmc.log("Valerion Cinema: Failed to set view mode", level=xbmc.LOGERROR)
+            else:
+                self.current_zoom_amt = zoom_amt
+                xbmc.log("Valerion Cinema: Set view mode to zoom:{} pixel ratio:{}".format(zoom_amt, pixel_ratio), level=xbmc.LOGINFO)
 
     def getActiveVideoPlayerId(self):
         req = {'jsonrpc': '2.0',"method": "Player.GetActivePlayers",
