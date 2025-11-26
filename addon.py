@@ -104,6 +104,23 @@ class Player(xbmc.Player):
                 xbmc.log("Valerion Cinema: Failed to parse DoVi L5 offsets", level=xbmc.LOGERROR)
         return None
 
+    def setDoViViewMode(self):
+        dovi_aspect = self.getDoViAspectRatio()
+        if dovi_aspect:
+            scope_screen_aspect = float(xbmcaddon.Addon().getSetting("screen_ar"))
+            standard_screen_aspect = 16/9
+            container_aspect = float(xbmc.getInfoLabel("Player.Process(VideoDAR)"))
+            
+            if dovi_aspect >= container_aspect:
+                zoom_amt = round(dovi_aspect / container_aspect, 2)
+            else:
+                zoom_amt = 1.0
+
+            pixel_ratio = round(standard_screen_aspect / scope_screen_aspect, 2)
+
+            self.setPlayerViewMode(zoom_amt, pixel_ratio)
+            notify("{} Video Fit to {} Screen\nzoom:{} pixel ratio:{}".format(dovi_aspect, scope_screen_aspect, zoom_amt, pixel_ratio))
+
     def setPlayerViewMode(self, zoom_amt, pixel_ratio):
         req = {'jsonrpc': '2.0',"method": "Player.SetViewMode",
                "params": {"viewmode": {"zoom": zoom_amt, "pixelratio": pixel_ratio}}, 
