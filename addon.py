@@ -85,6 +85,9 @@ class Player(xbmc.Player):
     def is_valid_infolabel(self, label, value):
         return value and value.strip() and value.lower() != label.lower()
     
+    def getInfoLabelInt(self, label):
+        return int(xbmc.getInfoLabel(label).replace(",", "") or 0)
+
     def getDoViAspectRatio(self):
         offset_top_label = 'Player.Process(video.dovi.l5.top.offset)'
         dovi_top = xbmc.getInfoLabel(offset_top_label)
@@ -92,12 +95,12 @@ class Player(xbmc.Player):
         if self.is_valid_infolabel(offset_top_label, dovi_top):
             try:
                 top = int(dovi_top.replace(",", ""))
-                bottom = int(xbmc.getInfoLabel('Player.Process(video.dovi.l5.bottom.offset)').replace(",", "") or 0)
-                left = int(xbmc.getInfoLabel('Player.Process(video.dovi.l5.left.offset)').replace(",", "") or 0)
-                right = int(xbmc.getInfoLabel('Player.Process(video.dovi.l5.right.offset)').replace(",", "") or 0)
+                bottom = self.getInfoLabelInt('Player.Process(video.dovi.l5.bottom.offset)')
+                left = self.getInfoLabelInt('Player.Process(video.dovi.l5.left.offset)')
+                right = self.getInfoLabelInt('Player.Process(video.dovi.l5.right.offset)')
                 
-                width = int(xbmc.getInfoLabel('Player.Process(VideoWidth)').replace(",", "") or 0)
-                height = int(xbmc.getInfoLabel('Player.Process(VideoHeight)').replace(",", "") or 0)
+                width = self.getInfoLabelInt('Player.Process(VideoWidth)')
+                height = self.getInfoLabelInt('Player.Process(VideoHeight)')
                 
                 if width > 0 and height > 0:
                     active_width = width - left - right
