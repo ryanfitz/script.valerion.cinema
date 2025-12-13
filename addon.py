@@ -28,6 +28,10 @@ class Player(xbmc.Player):
         self.current_pixel_ratio = None
 
     def onAVStarted(self):
+        # reset zoom and pixel ratio on new video
+        self.current_zoom_amt = None
+        self.current_pixel_ratio = None
+
         if not player.isPlayingVideo():
             return
 
