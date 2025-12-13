@@ -14,15 +14,18 @@ __addon = xbmcaddon.Addon(__addon_id__)
 __icon__ = __addon.getAddonInfo('icon')
 
 def notify(msg):
+    xbmc.log("Valerion Cinema: {}".format(msg), level=xbmc.LOGINFO)
     xbmcgui.Dialog().notification("Valerion Cinema", msg, __icon__, 5000)
 
 def warn(msg):
+    xbmc.log("Valerion Cinema: {}".format(msg), level=xbmc.LOGWARNING)
     xbmcgui.Dialog().notification("Valerion Cinema", msg, xbmcgui.NOTIFICATION_WARNING, 5000)
 
 class Player(xbmc.Player):
     def __init__(self):
         xbmc.Player.__init__(self)
         self.current_zoom_amt = None
+        self.current_pixel_ratio = None
 
     def onAVStarted(self):
         if not player.isPlayingVideo():
@@ -38,7 +41,7 @@ class Player(xbmc.Player):
 
         # Check for DoVi L5 offsets first
         dovi_aspect = self.getDoViAspectRatio()
-        if dovi_aspect:
+        if dovi_aspect is not None:
             video_aspect = dovi_aspect
         else:
             video_stream_details = self.getPlayingVideoStreamDetails()
@@ -131,7 +134,8 @@ class Player(xbmc.Player):
             # notify("{} Video Fit to {} Screen\nzoom:{} pixel ratio:{}".format(dovi_aspect, scope_screen_aspect, zoom_amt, pixel_ratio))
 
     def setPlayerViewMode(self, zoom_amt, pixel_ratio):
-        if zoom_amt != self.current_zoom_amt:
+        # xbmc.log("Valerion Cinema: attempting to set view mode to zoom:{} pixel ratio:{}".format(zoom_amt, pixel_ratio), level=xbmc.LOGINFO)
+        if zoom_amt != self.current_zoom_amt or pixel_ratio != self.current_pixel_ratio:
             req = {'jsonrpc': '2.0',"method": "Player.SetViewMode",
                    "params": {"viewmode": {"zoom": zoom_amt, "pixelratio": pixel_ratio}}, 
                    "id": 1
@@ -142,6 +146,7 @@ class Player(xbmc.Player):
                 xbmc.log("Valerion Cinema: Failed to set view mode", level=xbmc.LOGERROR)
             else:
                 self.current_zoom_amt = zoom_amt
+                self.current_pixel_ratio = pixel_ratio
                 xbmc.log("Valerion Cinema: Set view mode to zoom:{} pixel ratio:{}".format(zoom_amt, pixel_ratio), level=xbmc.LOGINFO)
 
     def getActiveVideoPlayerId(self):
