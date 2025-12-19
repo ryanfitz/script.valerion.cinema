@@ -111,7 +111,8 @@ class Player(xbmc.Player):
                 bottom = self.getInfoLabelInt('Player.Process(video.dovi.l5.bottom.offset)')
                 left = self.getInfoLabelInt('Player.Process(video.dovi.l5.left.offset)')
                 right = self.getInfoLabelInt('Player.Process(video.dovi.l5.right.offset)')
-                
+                xbmc.log("Valerion Cinema: DoVi L5 offsets top: {} bottom: {} left: {} right: {}".format(top, bottom, left, right), level=xbmc.LOGINFO)
+
                 width = self.getInfoLabelInt('Player.Process(VideoWidth)')
                 height = self.getInfoLabelInt('Player.Process(VideoHeight)')
                 
