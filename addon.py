@@ -104,8 +104,9 @@ class Player(xbmc.Player):
     def getDoViAspectRatio(self):
         offset_top_label = 'Player.Process(video.dovi.l5.top.offset)'
         dovi_top = xbmc.getInfoLabel(offset_top_label)
+        dovi_has_l5 = xbmc.getInfoLabel('Player.Process(video.dovi.has.l5)')
 
-        if self.is_valid_infolabel(offset_top_label, dovi_top):
+        if self.is_valid_infolabel(offset_top_label, dovi_top) and dovi_has_l5 == '1':
             try:
                 top = int(dovi_top.replace(",", ""))
                 bottom = self.getInfoLabelInt('Player.Process(video.dovi.l5.bottom.offset)')
