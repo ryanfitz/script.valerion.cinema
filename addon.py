@@ -43,20 +43,25 @@ class Player(xbmc.Player):
         video_aspect = None
         container_aspect = float(xbmc.getInfoLabel("Player.Process(VideoDAR)"))
 
+        aspect_source = "unknown"
         # Check for DoVi L5 offsets first
         dovi_aspect = self.getDoViAspectRatio()
         if dovi_aspect is not None:
             video_aspect = dovi_aspect
+            aspect_source = "DoVi"
         else:
             video_stream_details = self.getPlayingVideoStreamDetails()
             if video_stream_details is not None:
                 video_aspect = video_stream_details.get('video_ar')
+                aspect_source = "NFO"
         
         if xbmcaddon.Addon().getSetting("auto_detect_ar") == "false":
             video_aspect = self.manuallySelectVideoAspectRatio()
+            aspect_source = "Manual"
         elif video_aspect is None:
             warn("Video Aspect Ratio Not Detected, Manually Select")
             video_aspect = self.manuallySelectVideoAspectRatio()
+            aspect_source = "Manual"
 
         # only zoom videos wider than container
         if video_aspect >= container_aspect:
@@ -66,8 +71,8 @@ class Player(xbmc.Player):
 
         pixel_ratio = round(standard_screen_aspect / scope_screen_aspect, 2)
 
-        self.setPlayerViewMode(zoom_amt, pixel_ratio)
-        notify("{} Video Fit to {} Screen\nzoom:{} pixel ratio:{}".format(video_aspect, scope_screen_aspect, zoom_amt, pixel_ratio))
+        self.setPlayerViewMode(zoom_amt, pixel_ratio, aspect_source)
+        notify("{} Video Fit to {} Screen\n{} zoom:{} pixel ratio:{}".format(video_aspect, scope_screen_aspect, aspect_source, zoom_amt, pixel_ratio))
 
     def getPlayingVideoStreamDetails(self):
         playerid = self.getActiveVideoPlayerId()
@@ -137,7 +142,7 @@ class Player(xbmc.Player):
             self.setPlayerViewMode(zoom_amt, pixel_ratio)
             # notify("{} Video Fit to {} Screen\nzoom:{} pixel ratio:{}".format(dovi_aspect, scope_screen_aspect, zoom_amt, pixel_ratio))
 
-    def setPlayerViewMode(self, zoom_amt, pixel_ratio):
+    def setPlayerViewMode(self, zoom_amt, pixel_ratio, aspect_source):
         # xbmc.log("Valerion Cinema: attempting to set view mode to zoom:{} pixel ratio:{}".format(zoom_amt, pixel_ratio), level=xbmc.LOGINFO)
         if zoom_amt != self.current_zoom_amt or pixel_ratio != self.current_pixel_ratio:
             req = {'jsonrpc': '2.0',"method": "Player.SetViewMode",
@@ -151,7 +156,7 @@ class Player(xbmc.Player):
             else:
                 self.current_zoom_amt = zoom_amt
                 self.current_pixel_ratio = pixel_ratio
-                xbmc.log("Valerion Cinema: Set view mode to zoom:{} pixel ratio:{}".format(zoom_amt, pixel_ratio), level=xbmc.LOGINFO)
+                xbmc.log("Valerion Cinema: {} Set view mode to zoom:{} pixel ratio:{}".format(aspect_source, zoom_amt, pixel_ratio), level=xbmc.LOGINFO)
 
     def getActiveVideoPlayerId(self):
         req = {'jsonrpc': '2.0',"method": "Player.GetActivePlayers",
