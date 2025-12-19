@@ -26,11 +26,13 @@ class Player(xbmc.Player):
         xbmc.Player.__init__(self)
         self.current_zoom_amt = None
         self.current_pixel_ratio = None
+        self.video_stream_details = None
 
     def onAVStarted(self):
         # reset zoom and pixel ratio on new video
         self.current_zoom_amt = None
         self.current_pixel_ratio = None
+        self.video_stream_details = None
 
         if not player.isPlayingVideo():
             return
@@ -38,6 +40,7 @@ class Player(xbmc.Player):
         scope_screen_aspect = float(xbmcaddon.Addon().getSetting("screen_ar"))
         standard_screen_aspect = 16/9
 
+        self.video_stream_details = self.getPlayingVideoStreamDetails()
         # xbmc.log(msg=repr(player.getPlayingItem()), level=xbmc.LOGINFO)
 
         video_aspect = None
@@ -49,11 +52,9 @@ class Player(xbmc.Player):
         if dovi_aspect is not None:
             video_aspect = dovi_aspect
             aspect_source = "DoVi"
-        else:
-            video_stream_details = self.getPlayingVideoStreamDetails()
-            if video_stream_details is not None:
-                video_aspect = video_stream_details.get('video_ar')
-                aspect_source = "NFO"
+        elif self.video_stream_details is not None:
+            video_aspect = self.video_stream_details.get('video_ar')
+            aspect_source = "NFO"
         
         if xbmcaddon.Addon().getSetting("auto_detect_ar") == "false":
             video_aspect = self.manuallySelectVideoAspectRatio()
@@ -127,7 +128,7 @@ class Player(xbmc.Player):
 
     def setViewModeUsingDoViOffsets(self):
         dovi_aspect = self.getDoViAspectRatio()
-        if dovi_aspect:
+        if dovi_aspect is not None:
             scope_screen_aspect = float(xbmcaddon.Addon().getSetting("screen_ar"))
             standard_screen_aspect = 16/9
             container_aspect = float(xbmc.getInfoLabel("Player.Process(VideoDAR)"))
@@ -139,8 +140,7 @@ class Player(xbmc.Player):
 
             pixel_ratio = round(standard_screen_aspect / scope_screen_aspect, 2)
 
-            self.setPlayerViewMode(zoom_amt, pixel_ratio)
-            # notify("{} Video Fit to {} Screen\nzoom:{} pixel ratio:{}".format(dovi_aspect, scope_screen_aspect, zoom_amt, pixel_ratio))
+            self.setPlayerViewMode(zoom_amt, pixel_ratio, "DoVi")
 
     def setPlayerViewMode(self, zoom_amt, pixel_ratio, aspect_source):
         # xbmc.log("Valerion Cinema: attempting to set view mode to zoom:{} pixel ratio:{}".format(zoom_amt, pixel_ratio), level=xbmc.LOGINFO)
