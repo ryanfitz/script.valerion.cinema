@@ -27,12 +27,14 @@ class Player(xbmc.Player):
         self.current_zoom_amt = None
         self.current_pixel_ratio = None
         self.video_stream_details = None
+        self.has_active_dovi_l5_offsets = False
 
     def onAVStarted(self):
         # reset zoom and pixel ratio on new video
         self.current_zoom_amt = None
         self.current_pixel_ratio = None
         self.video_stream_details = None
+        self.has_active_dovi_l5_offsets = False
 
         if not player.isPlayingVideo():
             return
@@ -49,7 +51,7 @@ class Player(xbmc.Player):
         aspect_source = "unknown"
         # Check for DoVi L5 offsets first
         dovi_aspect = self.getDoViAspectRatio()
-        if dovi_aspect is not None:
+        if dovi_aspect is not None and self.has_active_dovi_l5_offsets:
             video_aspect = dovi_aspect
             aspect_source = "DoVi"
         elif self.video_stream_details is not None:
@@ -101,22 +103,27 @@ class Player(xbmc.Player):
     def getInfoLabelInt(self, label):
         return int(xbmc.getInfoLabel(label).replace(",", "") or 0)
 
+    def has_dovi_l5(self):
+        return xbmc.getInfoLabel('Player.Process(video.dovi.has.l5)') == '1'
+
     def getDoViAspectRatio(self):
         offset_top_label = 'Player.Process(video.dovi.l5.top.offset)'
         dovi_top = xbmc.getInfoLabel(offset_top_label)
-        dovi_has_l5 = xbmc.getInfoLabel('Player.Process(video.dovi.has.l5)')
 
-        if self.is_valid_infolabel(offset_top_label, dovi_top) and dovi_has_l5 == '1':
+        if self.is_valid_infolabel(offset_top_label, dovi_top) and self.has_dovi_l5():
             try:
                 top = int(dovi_top.replace(",", ""))
                 bottom = self.getInfoLabelInt('Player.Process(video.dovi.l5.bottom.offset)')
                 left = self.getInfoLabelInt('Player.Process(video.dovi.l5.left.offset)')
                 right = self.getInfoLabelInt('Player.Process(video.dovi.l5.right.offset)')
-                xbmc.log("Valerion Cinema: DoVi L5 offsets top: {} bottom: {} left: {} right: {}".format(top, bottom, left, right), level=xbmc.LOGINFO)
+                # xbmc.log("Valerion Cinema: DoVi L5 offsets top: {} bottom: {} left: {} right: {}".format(top, bottom, left, right), level=xbmc.LOGINFO)
 
                 width = self.getInfoLabelInt('Player.Process(VideoWidth)')
                 height = self.getInfoLabelInt('Player.Process(VideoHeight)')
                 
+                if top + bottom + left + right > 0:
+                    self.has_active_dovi_l5_offsets = True
+
                 if width > 0 and height > 0:
                     active_width = width - left - right
                     active_height = height - top - bottom
@@ -130,7 +137,7 @@ class Player(xbmc.Player):
 
     def setViewModeUsingDoViOffsets(self):
         dovi_aspect = self.getDoViAspectRatio()
-        if dovi_aspect is not None:
+        if dovi_aspect is not None and self.has_active_dovi_l5_offsets:
             scope_screen_aspect = float(xbmcaddon.Addon().getSetting("screen_ar"))
             standard_screen_aspect = 16/9
             container_aspect = float(xbmc.getInfoLabel("Player.Process(VideoDAR)"))
