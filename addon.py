@@ -54,14 +54,10 @@ class Player(xbmc.Player):
         if dovi_aspect is not None and self.has_active_dovi_l5_offsets:
             video_aspect = dovi_aspect
             aspect_source = "DoVi"
-        elif self.video_stream_details is not None:
+        elif self.video_stream_details is not None and self.video_stream_details.get('video_ar') is not None:
             video_aspect = self.video_stream_details.get('video_ar')
             aspect_source = "NFO"
-        
-        if xbmcaddon.Addon().getSetting("auto_detect_ar") == "false":
-            video_aspect = self.manuallySelectVideoAspectRatio()
-            aspect_source = "Manual"
-        elif video_aspect is None:
+        elif video_aspect is None or xbmcaddon.Addon().getSetting("auto_detect_ar") == "false":
             warn("Video Aspect Ratio Not Detected, Manually Select")
             video_aspect = self.manuallySelectVideoAspectRatio()
             aspect_source = "Manual"
